@@ -67,7 +67,8 @@ The wizard will guide you through several stages:
 
 ## 📁 Example Output
 
-* `dataset/your_dataset/create_dataset.py` — generated dataset builder script
+* `dataset/create_dataset.py` — generated dataset builder script
+* `dataset/dataset.py` — dataset class to load your data
 * `results/result.json` — interaction history (raw message objects)
 * `results/result.md` — human-readable summary of the conversation
 
@@ -88,14 +89,6 @@ dataset_wizard/
 ├── setup.py
 └── README.md
 ```
-
----
-
-## 🛠️ CLI Options (Coming Soon)
-
-* `--stage analyze_dir` to run specific stages
-* `--provider openai` to override default API
-* `--output results/result.md` to control save location
 
 ---
 
