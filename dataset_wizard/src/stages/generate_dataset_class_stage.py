@@ -38,7 +38,7 @@ class GenerateDatasetClassStage(AbsStage):
                 (messages,),
                 "Generating dataset class..."
             )
-            messages.append({"role": "model", "content": response})
+            messages.append({"role": provider.assistant_name, "content": response})
 
             # Extract code block
             code_blocks = re.findall(r"```(?:python)?\n(.*?)```", response, re.DOTALL)

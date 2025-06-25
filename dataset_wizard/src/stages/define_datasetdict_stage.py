@@ -43,7 +43,7 @@ class DefineDatasetDictStage(AbsStage):
             "Analyzing dataset dict by LLM..."
         )
         print(response)
-        messages.append({"role": "model", "content": response})
+        messages.append({"role": provider.assistant_name, "content": response})
 
         # Confirm or revise
         while True:
@@ -65,4 +65,4 @@ feedback and regenerate the table and example.
                     }
                 )
                 response = provider.chat(messages)
-                messages.append({"role": "model", "content": response})
+                messages.append({"role": provider.assistant_name, "content": response})

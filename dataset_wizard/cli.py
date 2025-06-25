@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import os
 
-# from providers.openai_provider import OpenAIProvider
+from dataset_wizard.src.providers.openai_provider import OpenAIProvider
 from dataset_wizard.src.providers.gemini_provider import GeminiProvider
 from dataset_wizard.src.utils import load_resource
 from dataset_wizard.src.stages.analyze_dir_stage import AnalyzeDirStage
@@ -14,11 +14,11 @@ from dataset_wizard.src.stages.validate_dataset_info_stage import ValidateDatase
 from dataset_wizard.src.stages.validate_dataset_class import ValidateDatasetClassStage
 from dataset_wizard.src.stages.generate_dataset_class_stage import GenerateDatasetClassStage
 
-DEFAULT_PROVIDER = "gemini"
-DEFAULT_MODEL = "gemini-2.5-flash"
+DEFAULT_PROVIDER = "openai"
+DEFAULT_MODEL = "o4-mini-2025-04-16"
 
 PROVIDER_REGISTRY = {
-    # "openai": OpenAIProvider,
+    "openai": OpenAIProvider,
     "gemini": GeminiProvider,
 }
 

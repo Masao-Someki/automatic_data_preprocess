@@ -9,6 +9,7 @@ class GeminiProvider:
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
         self.model = genai.GenerativeModel(model_name=self.model_name)
         self.chat_session = self.model.start_chat(history=[])
+        self.assistant_name = "model"
 
     def chat(self, messages):
         for msg in messages[:-1]:

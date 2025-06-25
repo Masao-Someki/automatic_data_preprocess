@@ -6,6 +6,7 @@ class OpenAIProvider:
         self.model = model
         # virtual env OPENAI_API_KEY is required
         self.client = openai.OpenAI()
+        self.assistant_name = "assistant"
 
     def chat(self, messages):
         response = self.client.chat.completions.create(

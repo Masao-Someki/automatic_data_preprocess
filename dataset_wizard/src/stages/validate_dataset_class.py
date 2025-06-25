@@ -46,23 +46,12 @@ class ValidateDatasetClassStage(AbsStage):
         )
 
         while True:
-            messages.append({"role": "model", "content": reply})
+            messages.append({"role": provider.assistant_name, "content": reply})
             if "All required information is available" in reply:
                 return messages
-            
-            # Extract missing info lines
-            missing_items = [
-                line.strip("-*• ") for line in reply.splitlines()
-                if any(kw in line.lower()
-                for kw in ["missing", "need", "unspecified", "unclear"])
-            ]
 
-            for item in missing_items:
-                user_response = self.get_user_input(f"""
-⚠️  Missing info: {item}
-Please provide clarification or additional information:
-""")
-                messages.append({"role": "user", "content": f"{item}\n{user_response}"})
+            user_response = self.get_user_input(reply)
+            messages.append({"role": "user", "content": user_response})
 
             messages.append({
                 "role": "user",

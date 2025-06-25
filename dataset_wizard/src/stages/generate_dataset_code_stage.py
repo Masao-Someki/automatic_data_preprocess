@@ -29,6 +29,7 @@ class GenerateDatasetCodeStage(AbsStage):
                 "content": (
                     "Based on the following reference script, generate a Python script of create_dataset.py\n"
                     "Please wrap the entire code in a single Python code block using triple backticks (```python).\n"
+                    "The default path for input_dir is the downloaded directory."
                 ),
             }
         )
@@ -40,7 +41,7 @@ class GenerateDatasetCodeStage(AbsStage):
                 (messages,),
                 "Generating create_dataset.py ..."
             )
-            messages.append({"role": "model", "content": response})
+            messages.append({"role": provider.assistant_name, "content": response})
 
             # Extract code block
             code_blocks = re.findall(r"```(?:python)?\n(.*?)```", response, re.DOTALL)

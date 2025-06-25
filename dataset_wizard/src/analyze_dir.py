@@ -92,7 +92,7 @@ def get_markdown(download_path):
     meta_paths = find_all_meta_files(tree, download_path)
     meta_previews = read_meta_files(meta_paths)
 
-    text = f"""## output
+    text = f"""## Analyzed directory: {download_path}
 **tree**
 ```
 {tree_output}

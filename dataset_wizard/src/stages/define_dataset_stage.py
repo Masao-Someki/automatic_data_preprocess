@@ -36,7 +36,7 @@ class DefineDatasetStage(AbsStage):
             (messages,),
             "Analyzing dataset directory by LLM..."
         )
-        messages.append({"role": "model", "content": response})
+        messages.append({"role": provider.assistant_name, "content": response})
         while True:
             confirm = self.get_user_input(
                 response + "\n\n"
@@ -54,7 +54,7 @@ class DefineDatasetStage(AbsStage):
                 final_response = provider.chat(messages)
                 print("\n[Generated Dataset Sample]\n")
                 print(final_response)
-                messages.append({"role": "model", "content": final_response})
+                messages.append({"role": provider.assistant_name, "content": final_response})
                 return messages
             else:
                 messages.append(
@@ -68,4 +68,4 @@ feedback and regenerate the table and example.
                     }
                 )
                 response = provider.chat(messages)
-                messages.append({"role": "model", "content": response})
+                messages.append({"role": provider.assistant_name, "content": response})
