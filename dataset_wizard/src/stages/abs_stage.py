@@ -38,7 +38,7 @@ class AbsStage(ABC):
         print("  [e] Edit using your default editor")
         print("  [Enter] Prompt again")
         while True:
-            user_choice = input("Your choice (y/e/any text): ").strip().lower()
+            user_choice = input("Your choice (y/e/any text): ").strip()
 
             if user_choice == "y":
                 return "y"

@@ -20,11 +20,7 @@ class ValidateDatasetClassStage(AbsStage):
         )
 
     def run_body(self, provider, messages: List[dict]) -> bool:
-        save_path = Path("dataset/dataset.py")
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-
-        with open("dataset/create_dataset.py", encoding="utf-8") as f:
-            reference_code = f.read()
+        reference_code = load_resource("ref_dataset.py")
 
         messages.append({
             "role": "user",
@@ -35,7 +31,7 @@ class ValidateDatasetClassStage(AbsStage):
                 ""
                 "If nothing is missing, reply only with: All required information is available."
                 "\n"
-                "**Reference code**\n"
+                "**Reference class**\n"
                 "```\n" + reference_code + "\n```"
             )
         })

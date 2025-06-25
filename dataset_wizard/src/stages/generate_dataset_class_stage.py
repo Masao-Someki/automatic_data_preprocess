@@ -5,6 +5,7 @@ from typing import List
 
 from dataset_wizard.src.stages.abs_stage import AbsStage
 from dataset_wizard.src.utils import run_with_spinner
+from dataset_wizard.src.utils import load_resource
 
 
 class GenerateDatasetClassStage(AbsStage):
@@ -21,11 +22,18 @@ class GenerateDatasetClassStage(AbsStage):
         save_path = Path("dataset/dataset.py")
         save_path.parent.mkdir(parents=True, exist_ok=True)
 
+        user_input = self.get_user_input(
+            "Do you want to change dataset class name from the default name? Default: Dataset)"
+        )
+        if user_input == "y":
+            user_input = "Dataset"
+
         messages.append(
             {
                 "role": "user",
                 "content": (
-                    "Based on the following reference script, generate a Python script of dataset.py\n"
+                    "Based on the following reference script, generate a Python script of dataset.py.\n"
+                    f"The class name should be {user_input}\n."
                     "Please wrap the entire code in a single Python code block using triple backticks (```python).\n"
                 ),
             }

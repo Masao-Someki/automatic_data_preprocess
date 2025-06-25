@@ -1,40 +1,52 @@
 import os
 from typing import Dict, Union
+from collections import defaultdict
 
+ARCHIVE_LIKE_EXTS = {
+    '.zip', '.tar', '.gz', '.tgz', '.bz2', '.xz', '.7z', '.rar',
+    '.sph', '.arc', '.zst', '.lz4', '.cab', '.rpm', '.img', '.iso',
+    '.bin', '.dat'
+}
 
-def summarize_tree(
-    path, max_dirs=5, max_files=5, sample_exts={".flac", ".mp3", ".wav", ".m4a"}
-):
+def summarize_tree(path, max_dirs=5, max_files=100):
     def summarize_dir(current_path) -> Dict[str, Union[list, dict]]:
         summary = {}
         try:
-            entries = os.listdir(current_path)
+            entries = os.scandir(current_path)
         except Exception as e:
             return {"_error": str(e)}
-        dirs, bulk, meta = [], [], []
-        for name in sorted(entries):
-            full_path = os.path.join(current_path, name)
-            if os.path.isdir(full_path):
-                dirs.append(name)
+
+        dirs = []
+        files_by_ext = defaultdict(list)
+        for entry in sorted(entries, key=lambda e: e.name):
+            if entry.name.startswith('.'):
+                continue
+            if entry.is_dir():
+                dirs.append(entry.name)
             else:
-                ext = os.path.splitext(name)[1]
-                if ext in sample_exts:
-                    bulk.append(name)
-                else:
-                    meta.append(name)
+                ext = os.path.splitext(entry.name)[1]
+                if ext in ARCHIVE_LIKE_EXTS:
+                    continue  
+                files_by_ext[ext].append(entry.name)
+
+        bulk_exts = {ext for ext, files in files_by_ext.items() if len(files) >= max_files}
+
+        file_summary = {}
+        for ext, files in files_by_ext.items():
+            tag = "_bulk" if ext in bulk_exts else "_meta"
+            display = files[:5]
+            if len(files) > 5:
+                display.append(f"... and {len(files) - 5} more")
+            if tag not in file_summary:
+                file_summary[tag] = []
+            file_summary[tag].extend(display)
+
         dir_summaries = {}
         for subdir in dirs[:max_dirs]:
             dir_summaries[subdir] = summarize_dir(os.path.join(current_path, subdir))
         if len(dirs) > max_dirs:
             dir_summaries["_more_dirs"] = f"... and {len(dirs) - max_dirs} more"
-        file_summary = {}
-        if bulk:
-            display = bulk[:max_files]
-            if len(bulk) > max_files:
-                display.append(f"... and {len(bulk) - max_files} more")
-            file_summary["_bulk"] = display
-        if meta:
-            file_summary["_meta"] = meta
+
         summary.update(dir_summaries)
         summary.update(file_summary)
         return summary
@@ -86,7 +98,7 @@ def read_meta_files(meta_paths, max_lines=5):
 
 
 def get_markdown(download_path):
-    tree = summarize_tree(download_path, max_dirs=2, max_files=4)
+    tree = summarize_tree(download_path, max_dirs=3, max_files=100)
 
     tree_output = print_summary_to_string(tree)
     meta_paths = find_all_meta_files(tree, download_path)

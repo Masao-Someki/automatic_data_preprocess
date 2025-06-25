@@ -1,11 +1,42 @@
 import numpy as np
 from lhotse import CutSet
 from torch.utils.data import Dataset
+from datasets import load_from_disk, Audio
 
-from espnet2.bin.s2t_inference import Speech2Text
 
 
-class EuroparlSTDataset(Dataset):
+class HuggingfaceDataset(Dataset):
+    def __init__(self, data_dir='data/', split=None):
+        dataset_dict = load_from_disk(data_dir)
+
+        if split:
+            if split in dataset_dict:
+                self.dataset = dataset_dict[split]
+            else:
+                raise ValueError(f"Split '{split}' not found in dataset.")
+        else:
+            self.dataset = dataset_dict
+            
+        self.dataset = self.dataset.cast_column("audio", Audio())
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        item = self.dataset[idx]
+        example = {
+            "speech": item["audio"]["array"].astype(np.float32),
+            "text": item["text"]
+        }
+        return example
+    
+    def get_text(self, idx):
+        item = self.dataset[idx]
+        return item["text"]
+
+
+
+class LhotseDataset(Dataset):
     def __init__(self, data_dir="data", split=None):
         if split is None:
             raise ValueError("STDataset requires a split name (e.g., 'dev', 'train')")
@@ -48,22 +79,3 @@ class EuroparlSTDataset(Dataset):
         tgt_lang = custom['tgt_lang']
         return custom[f"text.{tgt_lang}"].lower()
 
-
-class OWSMTokenizeTransform:
-    def __init__(self, model_tag):
-        owsm_model = Speech2Text.from_pretrained(model_tag)
-        self.tokenizer = owsm_model.tokenizer
-        self.converter = owsm_model.converter
-
-    def tokenize(self, text):
-        return np.array(self.converter.tokens2ids(self.tokenizer.text2tokens(text)))
-
-    def __call__(self, data):
-        example = data
-        ret = dict(
-            speech=example['speech'],
-            text=self.tokenize(example['text']),
-            text_ctc=self.tokenize(example['text_ctc']),
-            text_prev=self.tokenize(example['text_prev']),
-        )
-        return ret
